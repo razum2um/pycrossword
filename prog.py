@@ -25,7 +25,62 @@ class ApplicationWindow(QtGui.QMainWindow):
 
         self.label = QtGui.QTextEdit()
         self.compute = QtGui.QPushButton('Compute')
+        #
+        #crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, word_list)
+        #crossword.compute_crossword(2)
+        #import pickle
+        #self._crossword = pickle.load(open('dump_vert'))
+
+        #print crossword.solution()
+        #self._crossword = crossword
+        
+        self.table_view = CrossTableView()
         self.compute_new()
+
+        ## what's word under select coords ###
+        self._table_rows = self.built_ass_table(False, HEIGHT)
+        self._table_cols = self.built_ass_table(True, WIDTH)
+        #for n_row in range(HEIGHT):
+        #    for word in self._crossword.current_word_list:
+        #        if not word.vertical and word.row == n_row:
+        #                #print 'rows: hoz', word.row, word.word, 'cur_row', n_row
+        #                # append it
+        #                self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
+        #        elif word.vertical and word.row <= n_row < word.length + word.row:
+        #                #print 'rows: vert', word.row, word.length, word.word, 'cur_row', n_row
+        #                # word's letter on the row
+        #                # append it
+        #                self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
+        # 
+        #for n_col in range(WIDTH):
+        #    for word in self._crossword.current_word_list:
+        #        if word.vertical and word.col == n_col:
+        #                # append it
+        #                self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
+        #        elif not word.vertical and word.col <= n_col < word.length + word.col:
+        #                # word's letter on the col
+        #                # append it
+        #                self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
+        
+        #print 'self._table_rows.items'
+        #for k,v in self._table_rows.items():
+        #    print k,v     
+            
+        #print 'self._table_cols.items'
+        #for k,v in self._table_cols.items():
+        #    print k,v     
+            
+
+        #model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
+        #selection_model = QtGui.QItemSelectionModel(model)
+        #self.table_view.setModel(model)
+        #self.selection_model = QtGui.QItemSelectionModel(model)
+        #self.table_view.setSelectionModel(self.selection_model)
+
+        #delegate = LineEditDelegate(self.table_view, self._crossword)
+        #self.table_view.setItemDelegate(delegate)
+        
+        self.label.setHtml(self.gen_html())
 
         l.addWidget(self.table_view, 0,0,2,1)
         l.addWidget(self.label, 0,1)
@@ -36,59 +91,11 @@ class ApplicationWindow(QtGui.QMainWindow):
 
         self.statusBar().showMessage("Viva!", 2000)
 
-        self.connect(self.table_view.selectionModel(), QtCore.SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), self.selected_item_changed)
+        #self.connect(self.selection_model, QtCore.SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), self.selected_item_changed)
         self.connect(self.compute, QtCore.SIGNAL("clicked()"), self.compute_new)
 
-    def compute_new(self):
-        crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, word_list)
-        crossword.compute_crossword(2)
-        print crossword.solution()
-
-        self._crossword = crossword
-        ### what's word under select coords ###
-        self._table_rows = {}
-        for n_row in range(HEIGHT):
-            for word in self._crossword.current_word_list:
-                if not word.vertical and word.row == n_row:
-                        #print 'rows: hoz', word.row, word.word, 'cur_row', n_row
-                        # append it
-                        self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
-                elif word.vertical and word.row <= n_row < word.length + word.row:
-                        #print 'rows: vert', word.row, word.length, word.word, 'cur_row', n_row
-                        # word's letter on the row
-                        # append it
-                        self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
-        
-        self._table_cols = {}
-        for n_col in range(WIDTH):
-            for word in self._crossword.current_word_list:
-                if word.vertical and word.col == n_col:
-                        # append it
-                        self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
-                elif not word.vertical and word.col <= n_col < word.length + word.col:
-                        # word's letter on the col
-                        # append it
-                        self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
-        
-        #print 'self._table_rows.items'
-        #for k,v in self._table_rows.items():
-        #    print k,v     
-            
-        #print 'self._table_cols.items'
-        #for k,v in self._table_cols.items():
-        #    print k,v     
-            
-        #    
-        #    self._table.update({(word.row, word.col):word.clue})
-
-        self.table_view = CrossTableView(self._crossword)
-        #self.table_view.model().clear()
-        delegate = LineEditDelegate(self.table_view, crossword)
-        self.table_view.setItemDelegate(delegate)
-        
-        #self.label = QtGui.QLabel('\n'.join([x.clue for x in self._crossword.current_word_list]))
+    def gen_html(self):
         html = '<html><body>'
-        #html += '<style type="text/css"> p.marked {font-size:larger} </style>'
         html += 'Horizontal<br>'
         hor = filter(lambda(x):not x.vertical,  self._crossword.current_word_list)
         for w in hor:
@@ -100,7 +107,77 @@ class ApplicationWindow(QtGui.QMainWindow):
             html += w.clue
             html += '<br>'
         html += '</body></html>'
-        self.label.setHtml(html)
+        return html 
+
+    def built_ass_table(self,is_col_table,max):
+        table = {}
+        for n_row_col in range(max):
+            for word in self._crossword.current_word_list:
+                if is_col_table:
+                    if word.vertical and word.col == n_row_col:
+                        self.append_to_indexed_dic(n_row_col,{word.word:word.clue},table)
+                    elif not word.vertical and word.col <= n_row_col < word.length + word.col:
+                        # word's letter on the col
+                        # append it
+                        self.append_to_indexed_dic(n_row_col,{word.word:word.clue},table)
+                else:
+                    if not word.vertical and word.row == n_row_col:
+                        #print 'rows: hoz', word.row, word.word, 'cur_row', n_row_col
+                        # append it
+                        self.append_to_indexed_dic(n_row_col,{word.word:word.clue},table)
+                    elif word.vertical and word.row <= n_row_col < word.length + word.row:
+                        #print 'rows: vert', word.row, word.length, word.word, 'cur_row', n_row_col
+                        # word's letter on the row
+                        # append it
+                        self.append_to_indexed_dic(n_row_col,{word.word:word.clue},table) 
+        return table
+
+    def compute_new(self):
+        crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, word_list)
+        crossword.compute_crossword(2)
+        self._crossword = crossword
+    
+        ## debug ####################################
+        #import pickle, os 
+        #if self._crossword.current_word_list[0].vertical and not os.access('dump_vert', os.F_OK):
+        #    pickle.dump(self._crossword, open('dump_vert', 'w'))
+        #elif not self._crossword.current_word_list[0].vertical and not os.access('dump_hor', os.F_OK):
+        #    pickle.dump(self._crossword, open('dump_hor', 'w'))
+            
+        #if not self._crossword or not  self._crossword.current_word_list[0].vertical:
+        #    crossword = pickle.load(open('dump_vert'))
+        #else:
+        #    crossword = pickle.load(open('dump_hor'))
+        #self._crossword = crossword
+
+        print crossword.solution()
+        ################################################
+
+        #self.table_view = CrossTableView(self._crossword)
+        try:
+            self.table_view.model().clear()
+        except AttributeError:
+            pass
+        #self.table_view.selectionModel().clear()
+        #model2 = None
+        model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
+        self.table_view.setModel(model)
+
+        self.selection_model = QtGui.QItemSelectionModel(model)
+        self.table_view.setSelectionModel(self.selection_model)
+
+        delegate = LineEditDelegate(self.table_view, crossword)
+        self.table_view.setItemDelegate(delegate)
+
+        self.table_view.configure()
+
+        self.connect(self.selection_model, QtCore.SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), self.selected_item_changed)
+
+        self._table_rows = self.built_ass_table(False, HEIGHT)
+        self._table_cols = self.built_ass_table(True, WIDTH)
+        self.label.setHtml(self.gen_html())
+        return crossword
+
 
     def selected_item_changed(self, index, index2):
         curr_index = index.indexes()[0]
@@ -112,8 +189,11 @@ class ApplicationWindow(QtGui.QMainWindow):
             to_be_marked_by_col = self._table_cols[curr_index.column()]
         except KeyError:
             pass
+        #try:
         to_be_marked = [to_be_marked_by_row[v] for v in  filter(lambda x: x in to_be_marked_by_col, to_be_marked_by_row)]
-        #print [to_be_marked_by_row[x] for x in to_be_marked]
+        #except UnboundLocalError:
+        #    return
+        #print to_be_marked_by_row
         MARK_TAG_BEFORE='<span style=" font-style:italic; color:#ff0000;">'
         MARK_TAG_AFTER='</span>'
         self.label.setHtml(self.label.toHtml().replace(MARK_TAG_BEFORE, ''))

@@ -50,41 +50,43 @@ class LineEditDelegate(QtGui.QItemDelegate):
         painter.save()
 
         
-        try:
+        #try:
             #print index.column(), index.row()
-            #print self.cross.get_cell(index.row(),index.column(),)
-            if not self.cross.check_if_cell_clear(index.column(), index.row()):
-                if text == self.cross.get_cell(index.column(), index.row()):
-                    #print 'text == self.cross.get_cell(index.column(), index.row())'
-                    # correct
-                    if index == self.table_view.currentIndex():
-                        #print 'index == self.table_view.currentIndex'
-                        # highlight
-                        painter.fillRect(option.rect, QtGui.QColor(0,232,52,200))
-                    else:
-                        painter.fillRect(option.rect, QtGui.QColor(0,232,52,127))
+            #print '(%s:%s) %s' % (index.row(), index.column(), self.cross.get_cell(index.row(),index.column()))
+        if self.cross.get_cell(index.column(), index.row()) != ' ':
+            if text == self.cross.get_cell(index.column(), index.row()):
+                #print 'text == self.cross.get_cell(index.column(), index.row())'
+                # correct
+                if index == self.table_view.currentIndex():
+                    #print 'index == self.table_view.currentIndex'
+                    # highlight
+                    painter.fillRect(option.rect, QtGui.QColor(0,232,52,200))
                 else:
-                    if not text:
-                        #print 'not text'
-                        if index == self.table_view.currentIndex():
-                        # highlight
-                            painter.fillRect(option.rect, QtGui.QColor(74,155,254,200))
-                        else:
-                            #print 'index == self.table_view.currentIndex'
-                            #painter.eraseRect(option.rect)
-                            painter.fillRect(option.rect, QtGui.QColor(74,155,254,127))
+                    painter.fillRect(option.rect, QtGui.QColor(0,232,52,127))
+            else:
+                if not text:
+                    #print 'not text'
+                    if index == self.table_view.currentIndex():
+                    # highlight
+                        painter.fillRect(option.rect, QtGui.QColor(74,155,254,200))
                     else:
-                        # wrong
-                        if index == self.table_view.currentIndex():
-                        # highlight
-                            painter.fillRect(option.rect, QtGui.QColor(255,55,0,200))
-                        else:
-                            painter.fillRect(option.rect, QtGui.QColor(255,55,0,127))
+                        #print 'index == self.table_view.currentIndex'
+                        #painter.eraseRect(option.rect)
+                        painter.fillRect(option.rect, QtGui.QColor(74,155,254,127))
+                else:
+                    # wrong
+                    if index == self.table_view.currentIndex():
+                    # highlight
+                        painter.fillRect(option.rect, QtGui.QColor(255,55,0,200))
+                    else:
+                        painter.fillRect(option.rect, QtGui.QColor(255,55,0,127))
 
-            if index == self.table_view.currentIndex() and not text:
-                painter.fillRect(option.rect, QtGui.QColor(74,155,254,200))
-        except TypeError:
-            pass
+        #if (option.state & QtGui.QStyle.State_Selected):
+        #            painter.fillRect(option.rect, option.palette.highlight().color())
+        if index == self.table_view.currentIndex() and not text:
+            painter.fillRect(option.rect, QtGui.QColor(74,155,254,200))
+        #except TypeError:
+        #    pass
 
         painter.drawText(option.rect,  QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter, text)
         painter.restore()
@@ -107,26 +109,19 @@ class LineEditDelegate(QtGui.QItemDelegate):
 
 class CrossTableView(QtGui.QTableView):
     def __init__(self, crossword = None, parent = None):
+
+        super(CrossTableView, self).__init__(parent)
+
+        #model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
+        #selection_model = QtGui.QItemSelectionModel(model)
+        #self.setModel(model)
+        #selection_model = QtGui.QItemSelectionModel(model)
+        #self.setSelectionModel(selection_model)
+    def configure(self):
         HEIGHT = 12
         WIDTH = 12
         COL_WIDTH = 35
         ROW_HIEGHT = 35
-
-        super(CrossTableView, self).__init__(parent)
-        #self.reset()
-        try:
-            self.model().clear()
-        except AttributeError:
-            # 1st run
-            print 'pass'
-            pass
-
-        model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
-        selection_model = QtGui.QItemSelectionModel(model)
-        self.setModel(model)
-        #self.model().beginResetModel()
-
-        self.setSelectionModel(selection_model)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setVisible(False)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
