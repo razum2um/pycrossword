@@ -76,13 +76,13 @@ class ApplicationWindow(QtGui.QMainWindow):
         #                # append it
         #                self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
         
-        print '\nself._table_rows.items'
-        for k,v in self._table_rows.items():
-            print k,v.keys()
+        #print '\nself._table_rows.items'
+        #for k,v in self._table_rows.items():
+        #    print k,v.keys()
             
-        print '\nself._table_cols.items'
-        for k,v in self._table_cols.items():
-            print k,v.keys()
+        #print '\nself._table_cols.items'
+        #for k,v in self._table_cols.items():
+        #    print k,v.keys()
             
 
         #model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
@@ -213,11 +213,11 @@ class ApplicationWindow(QtGui.QMainWindow):
         fileName = QtGui.QFileDialog.getOpenFileName(self, QtCore.QString("Open file"), os.getcwd(), QtCore.QString("Text files (*.txt)"))
         raw = open(fileName).read()
         words = re.findall('(\w+).*?=.*?(.*)', raw)
-        for i in words:
-            print i
 
         crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, words)
         self._crossword = crossword
+        self._crossword.compute_crossword(2)
+        self.compute_new()
 
     def selected_item_changed(self, index, index2):
         curr_index = index.indexes()[0]
@@ -231,16 +231,16 @@ class ApplicationWindow(QtGui.QMainWindow):
             pass
 
         to_be_marked = [to_be_marked_by_row[v] for v in  filter(lambda x: x in to_be_marked_by_col, to_be_marked_by_row)]
-        print to_be_marked
+        #print to_be_marked
         MARK_TAG_BEFORE='<i><font color="red">'
         MARK_TAG_AFTER='</font></i>'
 
-        print '\nself.label.toPlainText('
+        t = self.label.toPlainText()
         for m in to_be_marked:
             raw = m.strip()
-            t = self.label.toPlainText().replace(raw, MARK_TAG_BEFORE+raw+MARK_TAG_AFTER)
+            t = t.replace(raw, MARK_TAG_BEFORE+raw+MARK_TAG_AFTER)
             t = t.replace('\n', '<br>')
-            self.label.setHtml('<html><body>'+t+'</body></html>')
+        self.label.setHtml('<html><body>'+t+'</body></html>')
 
     def append_to_indexed_dic(self, index, value, dic):
         if index not in dic:
