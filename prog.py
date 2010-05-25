@@ -39,6 +39,9 @@ class ApplicationWindow(QtGui.QMainWindow):
 
         self.label = QtGui.QTextEdit()
         self.compute = QtGui.QPushButton('Compute')
+        self.bt_tell_one = QtGui.QPushButton('Tell one')
+        #self.compute = QtGui.QPushButton('Solution')
+        
         #
         #crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, word_list)
         #crossword.compute_crossword(2)
@@ -99,6 +102,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         l.addWidget(self.table_view, 0,0,2,1)
         l.addWidget(self.label, 0,1)
         l.addWidget(self.compute, 1,1)
+        l.addWidget(self.bt_tell_one, 1,2)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -107,6 +111,51 @@ class ApplicationWindow(QtGui.QMainWindow):
 
         #self.connect(self.selection_model, QtCore.SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), self.selected_item_changed)
         self.connect(self.compute, QtCore.SIGNAL("clicked()"), self.shuffle)
+        self.connect(self.bt_tell_one, QtCore.SIGNAL("clicked()"), self.tell_one)
+        #self.connect(self.compute, QtCore.SIGNAL("clicked()"), self.shuffle)
+
+    def get_tbl(self):
+        _tbl = []
+        for row in range(HEIGHT):
+            row_tbl = []
+            for col_cell in range(WIDTH):
+                row_tbl.append(self._crossword.get_cell(col_cell, row).replace(' ',''))
+            _tbl.append(row_tbl)
+        return _tbl
+
+    def get_filled_tbl(self):
+        _tbl = []
+        for x in range(HEIGHT):
+            _row_tbl = []
+            for y in range(WIDTH):
+                ind = self.table_view.model().index(x,y)
+                text = self.table_view.model().data(ind, QtCore.Qt.DisplayRole).toString()
+                _row_tbl.append(str(text.toUtf8()))
+            _tbl.append(_row_tbl)
+        return _tbl
+
+    def tell_one(self):
+        import random
+        diff = []
+        t = self.get_tbl()
+        f = self.get_filled_tbl()
+        for x in range(len(t)):
+            for y in range(len(t[x])):
+                if t[x][y] != f[x][y]:
+                    diff.append((x,y))
+        x,y = random.choice(diff)
+        print x,y,t[x][y]
+        ind = self.table_view.model().createIndex(x,y)
+        print ind
+        self.table_view.model().setItemData(ind, {1:QtCore.QVariant(t[x][y])})
+        self.table_view.model().setData(ind, QtCore.QVariant(t[x][y]))
+        #for i in len(get
+        #print self.get_tbl() - self.get_filled_tbl()
+        #for r in range(HEIGHT):
+        #    for cell in range(WIDTH):
+        #        print tbl[r][cell],
+        #    print
+
 
     def gen_html(self):
         html = '<html><body>'
