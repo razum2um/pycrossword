@@ -40,16 +40,6 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.label = QtGui.QTextEdit()
         self.compute = QtGui.QPushButton('Compute')
         self.bt_tell_one = QtGui.QPushButton('Tell one')
-        #self.compute = QtGui.QPushButton('Solution')
-        
-        #
-        #crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, word_list)
-        #crossword.compute_crossword(2)
-        #import pickle
-        #self._crossword = pickle.load(open('dump_vert'))
-
-        #print crossword.solution()
-        #self._crossword = crossword
         
         self.table_view = CrossTableView()
         self.load_prev_crossword()
@@ -57,46 +47,6 @@ class ApplicationWindow(QtGui.QMainWindow):
         ## what's word under select coords ###
         self._table_rows = self.built_ass_table(False, HEIGHT)
         self._table_cols = self.built_ass_table(True, WIDTH)
-        #for n_row in range(HEIGHT):
-        #    for word in self._crossword.current_word_list:
-        #        if not word.vertical and word.row == n_row:
-        #                #print 'rows: hoz', word.row, word.word, 'cur_row', n_row
-        #                # append it
-        #                self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
-        #        elif word.vertical and word.row <= n_row < word.length + word.row:
-        #                #print 'rows: vert', word.row, word.length, word.word, 'cur_row', n_row
-        #                # word's letter on the row
-        #                # append it
-        #                self.append_to_indexed_dic(n_row,{word.word:word.clue},self._table_rows)
-        # 
-        #for n_col in range(WIDTH):
-        #    for word in self._crossword.current_word_list:
-        #        if word.vertical and word.col == n_col:
-        #                # append it
-        #                self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
-        #        elif not word.vertical and word.col <= n_col < word.length + word.col:
-        #                # word's letter on the col
-        #                # append it
-        #                self.append_to_indexed_dic(n_col,{word.word:word.clue},self._table_cols)
-        
-        #print '\nself._table_rows.items'
-        #for k,v in self._table_rows.items():
-        #    print k,v.keys()
-            
-        #print '\nself._table_cols.items'
-        #for k,v in self._table_cols.items():
-        #    print k,v.keys()
-            
-
-        #model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
-        #selection_model = QtGui.QItemSelectionModel(model)
-        #self.table_view.setModel(model)
-        #self.selection_model = QtGui.QItemSelectionModel(model)
-        #self.table_view.setSelectionModel(self.selection_model)
-
-        #delegate = LineEditDelegate(self.table_view, self._crossword)
-        #self.table_view.setItemDelegate(delegate)
-        
         self.label.setHtml(self.gen_html())
 
         l.addWidget(self.table_view, 0,0,2,1)
@@ -144,11 +94,7 @@ class ApplicationWindow(QtGui.QMainWindow):
                 if t[x][y] != f[x][y]:
                     diff.append((x,y))
         x,y = random.choice(diff)
-        print x,y,t[x][y]
-        ind = self.table_view.model().createIndex(x,y)
-        print ind
-        self.table_view.model().setItemData(ind, {1:QtCore.QVariant(t[x][y])})
-        self.table_view.model().setData(ind, QtCore.QVariant(t[x][y]))
+        self.table_view.insert_manually(1,1,'1')
         #for i in len(get
         #print self.get_tbl() - self.get_filled_tbl()
         #for r in range(HEIGHT):
@@ -230,8 +176,9 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.selection_model = QtGui.QItemSelectionModel(model)
         self.table_view.setSelectionModel(self.selection_model)
 
-        delegate = LineEditDelegate(self.table_view, self._crossword)
-        self.table_view.setItemDelegate(delegate)
+        #delegate = LineEditDelegate(self.table_view, self._crossword)
+        #self.table_view.setItemDelegate(delegate)
+        #print self.table_view.itemDelegate()
 
         self.table_view.configure()
 
@@ -254,7 +201,7 @@ class ApplicationWindow(QtGui.QMainWindow):
             self.load_txt()
 
     def about(self):
-        msg = QtGui.QMessageBox()
+        msg = QtGui.QMessageBox(self)
         msg.setText("Author: Vlad Bokov")
         msg.show()
 
@@ -269,15 +216,16 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.compute_new()
 
     def selected_item_changed(self, index, index2):
+        print 'selected'
         curr_index = index.indexes()[0]
         try:
             to_be_marked_by_row = self._table_rows[curr_index.row()]
         except KeyError:
-            pass
+            return
         try:
             to_be_marked_by_col = self._table_cols[curr_index.column()]
         except KeyError:
-            pass
+            return
 
         to_be_marked = [to_be_marked_by_row[v] for v in  filter(lambda x: x in to_be_marked_by_col, to_be_marked_by_row)]
         #print to_be_marked

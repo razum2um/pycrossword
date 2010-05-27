@@ -14,22 +14,11 @@ class CharLineEdit(QtGui.QLineEdit):
         #QtGui.QLineEdit.__init__(self, parent)
         super(CharLineEdit, self).__init__(parent)
 
-        #self.connect(self, QtCore.SIGNAL("cursorPositionChanged()"), self, QtCore.SIGNAL("editingFinished()"))
-        #self.connect(self, QtCore.SIGNAL("textChanged()"), self.finish)
-
     def keyPressEvent(self, ev):
         if ev.key() == QtCore.Qt.Key_Right or ev.key() == QtCore.Qt.Key_Left:
             QtGui.QApplication.sendEvent(self, QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Return, QtCore.Qt.NoModifier))
         else:
             QtGui.QLineEdit.keyPressEvent(self, ev)
-
-    #def eventFilter( self, obj, event ):
-    #    print 'event'
-    #    if QtCore.Qt.Key_A <= event.key() <= QtCore.Qt.Key_Z:
-    #        print event.key()
-    #def finish(self):
-    #    print 'we'
-    #    self.emit(QtCore.SIGNAL('editingFinished()'), self.sender())
 
 class LineEditDelegate(QtGui.QItemDelegate):
     def __init__(self, tw = None, cross = None, parent = None):
@@ -134,10 +123,20 @@ class CrossTableView(QtGui.QTableView):
         #delegate = LineEditDelegate(self, crossword)
         #self.setItemDelegate(delegate)
         
-        #for row in range(4):
-        #    for column in range(2):
-        #        index = model.index(row, column, QtCore.QModelIndex())
-        #        model.setData(index, QtCore.QVariant((row+1) * (column+1)))
+        for row in range(4):
+            for column in range(2):
+                index = self.model().index(row, column, QtCore.QModelIndex())
+                self.model().setData(index, QtCore.QVariant((row+1) * (column+1)))
+
+    def insert_manually(self, row, column , value):
+        index = self.model().index(row, column, QtCore.QModelIndex())
+        self.model().setData(index, QtCore.QVariant(value))
+
+    def setMyItemDelegate(self, index):
+        pass
+        
+    def myitemDelegate(self, index):
+        return self.itemDelegate(index)
         
         #self.setWindowTitle("Delegate")
 
