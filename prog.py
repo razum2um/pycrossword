@@ -94,7 +94,8 @@ class ApplicationWindow(QtGui.QMainWindow):
                 if t[x][y] != f[x][y]:
                     diff.append((x,y))
         x,y = random.choice(diff)
-        self.table_view.insert_manually(1,1,'1')
+        print 'tell_one called:'
+        self.table_view.insert_manually(x,y,t[x][y])
         #for i in len(get
         #print self.get_tbl() - self.get_filled_tbl()
         #for r in range(HEIGHT):
