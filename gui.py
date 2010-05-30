@@ -99,6 +99,7 @@ class LineEditDelegate(QtGui.QItemDelegate):
 class CrossTableView(QtGui.QTableView):
     def __init__(self, crossword = None, parent = None):
 
+        self.crossword = crossword
         super(CrossTableView, self).__init__(parent)
 
         #model = QtGui.QStandardItemModel(WIDTH, HEIGHT)
@@ -120,13 +121,9 @@ class CrossTableView(QtGui.QTableView):
             self.setRowHeight(i, ROW_HIEGHT)
         
         #if crossword:
-        #delegate = LineEditDelegate(self, crossword)
-        #self.setItemDelegate(delegate)
         
-        for row in range(4):
-            for column in range(2):
-                index = self.model().index(row, column, QtCore.QModelIndex())
-                self.model().setData(index, QtCore.QVariant((row+1) * (column+1)))
+        delegate = LineEditDelegate(self, self.crossword)
+        self.setItemDelegate(delegate)
 
     def insert_manually(self, row, column , value):
         index = self.model().index(row, column, QtCore.QModelIndex())

@@ -41,7 +41,6 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.compute = QtGui.QPushButton('Compute')
         self.bt_tell_one = QtGui.QPushButton('Tell one')
         
-        self.table_view = CrossTableView()
         self.load_prev_crossword()
 
         ## what's word under select coords ###
@@ -161,6 +160,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         #    crossword = pickle.load(open('dump_hor'))
         #self._crossword = crossword
 
+
         print self._crossword.solution()
         ################################################
 
@@ -197,9 +197,13 @@ class ApplicationWindow(QtGui.QMainWindow):
     def load_prev_crossword(self):
         if os.access(CONFIG_DAT, os.F_OK):
             self._crossword = pickle.load(open(CONFIG_DAT))
+            self.table_view = CrossTableView(self._crossword)
             self.compute_new()
         else:
             self.load_txt()
+            self.table_view = CrossTableView(self._crossword)
+            
+            self.compute_new()
 
     def about(self):
         msg = QtGui.QMessageBox(self)
@@ -214,11 +218,15 @@ class ApplicationWindow(QtGui.QMainWindow):
         crossword = Crossword(WIDTH, HEIGHT, ' ', 5000, words)
         self._crossword = crossword
         self._crossword.compute_crossword(2)
-        self.compute_new()
 
     def selected_item_changed(self, index, index2):
         print 'selected'
         curr_index = index.indexes()[0]
+        # is there a letter?
+        if not self.get_tbl()[curr_index.row()][curr_index.column()]:
+            self.label.setHtml(self.label.toPlainText().replace('\n', '<br>'))
+            return
+
         try:
             to_be_marked_by_row = self._table_rows[curr_index.row()]
         except KeyError:
