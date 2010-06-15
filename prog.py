@@ -18,19 +18,19 @@ class ApplicationWindow(QtGui.QMainWindow):
         super(ApplicationWindow, self).__init__(parent)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("application main window")
+        self.setWindowTitle(u"Кроссвордогенератор")
 
         ## menu ##
-        self.file_menu = QtGui.QMenu('&File', self)
-        self.file_menu.addAction('&Open', self.load_txt, QtCore.Qt.CTRL + QtCore.Qt.Key_H)
-        self.file_menu.addAction('&Quit', self.quit, QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
+        self.file_menu = QtGui.QMenu(u'&Файл', self)
+        self.file_menu.addAction(u'&Открыть', self.load_txt, QtCore.Qt.CTRL + QtCore.Qt.Key_H)
+        self.file_menu.addAction(u'&Закрыть', self.quit, QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
-        self.help_menu = QtGui.QMenu('&Help', self)
+        self.help_menu = QtGui.QMenu(u'&Справка', self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
 
-        self.help_menu.addAction('&About', self.about)
+        self.help_menu.addAction(u'&Об авторе', self.about)
         ## end menu ##
 
         self.main_widget = QtGui.QWidget(self)
@@ -38,8 +38,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         
 
         self.label = QtGui.QTextEdit()
-        self.compute = QtGui.QPushButton('Compute')
-        self.bt_tell_one = QtGui.QPushButton('Tell one')
+        self.compute = QtGui.QPushButton(u'Генерировать')
+        self.bt_tell_one = QtGui.QPushButton(u'Подсказка')
         
         self.load_prev_crossword()
 
@@ -49,14 +49,14 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.label.setHtml(self.gen_html())
 
         l.addWidget(self.table_view, 0,0,2,1)
-        l.addWidget(self.label, 0,1)
+        l.addWidget(self.label, 0,1,1,2)
         l.addWidget(self.compute, 1,1)
         l.addWidget(self.bt_tell_one, 1,2)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
-        self.statusBar().showMessage("Viva!", 2000)
+        self.statusBar().showMessage(u"Здравствуйте!", 2000)
 
         #self.connect(self.selection_model, QtCore.SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), self.selected_item_changed)
         self.connect(self.compute, QtCore.SIGNAL("clicked()"), self.shuffle)
@@ -105,12 +105,12 @@ class ApplicationWindow(QtGui.QMainWindow):
 
     def gen_html(self):
         html = '<html><body>'
-        html += 'Horizontal<br>'
+        html += 'Waagerecht<br>'
         hor = filter(lambda(x):not x.vertical,  self._crossword.current_word_list)
         for w in hor:
             html += w.clue.strip()
             html += '<br>'
-        html += '<br>Vertical<br>'
+        html += '<br>Senkrecht<br>'
         ver = filter(lambda(x):x.vertical,  self._crossword.current_word_list)
         for w in ver:
             html += w.clue.strip()
